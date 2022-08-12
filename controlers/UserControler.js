@@ -80,21 +80,45 @@ export const login = async(req, res) => {
 
 export const getMe = async(req, res) => {
     try {
-        const user = await UserModel.findById(req.userId)
+        const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
-                message: "User doesn't exist"
-            })
+                message: "User doesn't exist",
+            });
         }
         const {
             passwordHash,
             ...userData
         } = user._doc;
-        res.json(userData);
+        res.json({
+            userData,
+        });
     } catch (e) {
         console.log(e);
         res.status(500).json({
-            message: "Error on get user."
-        })
+            message: "Error on get user.",
+        });
     }
-}
+};
+
+export const getOneUser = async(req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                message: "User doesn't exist",
+            });
+        }
+        const {
+            passwordHash,
+            ...data
+        } = user._doc;
+        res.json(data);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            message: "Error on get user.",
+        });
+    }
+};

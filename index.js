@@ -66,7 +66,9 @@ app.get("/posts", PostControler.getAll)
 app.get("/posts/:id", PostControler.getOne);
 app.patch("/posts/:id", checkAuth, postCreateValidation, handleValidErrors, PostControler.update)
 app.delete("/posts/:id", checkAuth, PostControler.remove)
-app.get("/posts/like/:id", checkAuth, PostControler.getCountLikes)
+app.get("/posts/like/:id", PostControler.getCountLikes);
+app.get("/user/:id", UserControler.getOneUser);
+app.get("/user/:id/posts", PostControler.getPostsByUserId);
 
 app.listen(3001, (err) => {
     if (err) {

@@ -166,13 +166,28 @@ export const getCountLikes = async(req, res) => {
         let count = post[0].likesCount.length;
 
         res.json({
-            likes: count
-        })
+            likes: count,
+        });
     } catch (e) {
         console.log(e);
         res.status(500).json({
             message: "Error on like or dislike.",
         });
     }
+};
 
-}
+export const getPostsByUserId = async(req, res) => {
+    try {
+        const userId = req.params.id;
+        const posts = await PostModel.find({
+            user: userId,
+        });
+        console.log(posts);
+        res.json(posts);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            message: "Error on getting posts",
+        });
+    }
+};
