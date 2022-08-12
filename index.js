@@ -15,7 +15,10 @@ import {
 import checkAuth from "./utils/checkAuth.js";
 
 mongoose
-    .connect(process.env.MONGODB_URI)
+    .connect(
+        process.env.MONGODB_URI ||
+        "mongodb+srv://kr1sto:1s2a3dqwer5@cluster0.t1pxavl.mongodb.net/quotes?retryWrites=true&w=majority"
+    )
     .then(() => console.log("DB ok!"))
     .catch((e) => console.log("DB error!", e));
 
