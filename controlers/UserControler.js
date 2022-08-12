@@ -24,9 +24,9 @@ export const register = async(req, res) => {
             ...userData
         } = user._doc;
         res.json({
-            ...userData,
+            userData,
             token,
-        })
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({
