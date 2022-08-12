@@ -14,10 +14,10 @@ import {
 } from "./controlers/index.js";
 import checkAuth from "./utils/checkAuth.js";
 
-mongoose.connect(
-        "mongodb+srv://kr1sto:1s2a3dqwer5@cluster0.t1pxavl.mongodb.net/quotes?retryWrites=true&w=majority"
-    ).then(() => console.log("DB ok!"))
-    .catch((e) => console.log("DB error!", e))
+mongoose
+    .connect(process.env.MONGODB_URL)
+    .then(() => console.log("DB ok!"))
+    .catch((e) => console.log("DB error!", e));
 
 const app = express();
 
@@ -26,13 +26,13 @@ const storage = multer.diskStorage({
         cb(null, "uploads");
     },
     filename: (_, file, cb) => {
-        cb(null, file.originalname)
-    }
-})
+        cb(null, file.originalname);
+    },
+});
 
 const upload = multer({
-    storage
-})
+    storage,
+});
 app.use(cors());
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -56,21 +56,42 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
 
 app.use(express.json());
 
-
-app.post("/auth/register", registerValidation, handleValidErrors, UserControler.register)
-app.post("/auth/login", loginValidation, handleValidErrors, UserControler.login)
-app.post("/posts", checkAuth, postCreateValidation, handleValidErrors, PostControler.create);
-app.post("/posts/like/:id", checkAuth, PostControler.likingLogic)
-app.get("/auth/me", checkAuth, UserControler.getMe)
-app.get("/posts", PostControler.getAll)
+app.post(
+    "/auth/register",
+    registerValidation,
+    handleValidErrors,
+    UserControler.register
+);
+app.post(
+    "/auth/login",
+    loginValidation,
+    handleValidErrors,
+    UserControler.login
+);
+app.post(
+    "/posts",
+    checkAuth,
+    postCreateValidation,
+    handleValidErrors,
+    PostControler.create
+);
+app.post("/posts/like/:id", checkAuth, PostControler.likingLogic);
+app.get("/auth/me", checkAuth, UserControler.getMe);
+app.get("/posts", PostControler.getAll);
 app.get("/posts/:id", PostControler.getOne);
-app.patch("/posts/:id", checkAuth, postCreateValidation, handleValidErrors, PostControler.update)
-app.delete("/posts/:id", checkAuth, PostControler.remove)
+app.patch(
+    "/posts/:id",
+    checkAuth,
+    postCreateValidation,
+    handleValidErrors,
+    PostControler.update
+);
+app.delete("/posts/:id", checkAuth, PostControler.remove);
 app.get("/posts/like/:id", PostControler.getCountLikes);
 app.get("/user/:id", UserControler.getOneUser);
 app.get("/user/:id/posts", PostControler.getPostsByUserId);
 
-app.listen(3001, (err) => {
+app.listen(process.env.PORT || 3001, (err) => {
     if (err) {
         return console.log(err);
     }
