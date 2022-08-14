@@ -93,6 +93,7 @@ app.delete("/posts/:id", checkAuth, PostControler.remove);
 app.get("/posts/like/:id", PostControler.getCountLikes);
 app.get("/user/:id", UserControler.getOneUser);
 app.get("/user/:id/posts", PostControler.getPostsByUserId);
+app.post("/posts/tags", checkAuth, PostControler.getPostsByTags);
 
 app.listen(process.env.PORT || 3001, (err) => {
     if (err) {

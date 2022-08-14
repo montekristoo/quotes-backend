@@ -120,42 +120,41 @@ export const likingLogic = async(req, res) => {
         const postId = req.params.id;
         const action = req.body.action;
         const userId = req.body.userId;
-        // if (!action) return;
-        if (action === 'like') {
+        if (!action) return;
+        if (action === "like") {
             await PostModel.updateOne({
-                _id: postId
+                _id: postId,
             }, {
                 $push: {
-                    likesCount: userId
-                }
-            })
+                    likesCount: userId,
+                },
+            });
         }
-        if (action === 'dislike') {
+        if (action === "dislike") {
             await PostModel.updateOne({
-                _id: postId
+                _id: postId,
             }, {
                 $pull: {
-                    likesCount: userId
-                }
-            })
+                    likesCount: userId,
+                },
+            });
         }
         const post = await PostModel.find({
-            _id: postId
-        })
+            _id: postId,
+        });
 
-        let count = post[0].likesCount.length
+        let count = post[0].likesCount.length;
 
         res.json({
-            likes: count
-        })
-
+            likes: count,
+        });
     } catch (e) {
         console.log(e);
         res.status(500).json({
-            message: "Error on like or dislike."
-        })
+            message: "Error on like or dislike.",
+        });
     }
-}
+};
 
 export const getCountLikes = async(req, res) => {
     try {
@@ -182,8 +181,24 @@ export const getPostsByUserId = async(req, res) => {
         const posts = await PostModel.find({
             user: userId,
         });
-        console.log(posts);
         res.json(posts);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            message: "Error on getting posts",
+        });
+    }
+};
+
+export const getPostsByTags = async(req, res) => {
+    try {
+        const tags = req.body.content.split(",");
+        console.log(tags);
+        const posts = await PostModel.find().populate("user").exec();
+        let filterPosts = posts.filter((item) =>
+            item.tags.some((tag) => tags.includes(tag))
+        );
+        res.json(filterPosts);
     } catch (e) {
         console.log(e);
         res.status(500).json({
