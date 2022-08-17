@@ -43,77 +43,94 @@ export const update = async(req, res) => {
 
 export const getAll = async(req, res) => {
     try {
-        const posts = await PostModel.find().populate('user').exec();
-        res.json(posts)
+        const {
+            page = 1, limit = 10
+        } = req.query;
+        const items = await PostModel.find()
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .populate("user")
+            .exec();
+        const count = await PostModel.countDocuments();
+
+        res.json({
+            items,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        });
     } catch (e) {
         console.log(e);
         res.status(500).json({
-            message: "Error on get all posts."
-        })
+            message: "Error on getting posts.",
+        });
     }
-}
+};
 
 export const getOne = async(req, res) => {
     try {
         const postId = req.params.id;
         PostModel.findOneAndUpdate({
-            _id: postId,
-        }, {
-            $inc: {
-                viewsCount: 1
+                _id: postId,
+            }, {
+                $inc: {
+                    viewsCount: 1,
+                },
+            }, {
+                returnDocument: "after",
             },
-        }, {
-            returnDocument: 'after',
-        }, (err, doc) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({
-                    message: "Error on get post by id."
-                })
+            (err, doc) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({
+                        message: "Error on get post by id.",
+                    });
+                }
+                if (!doc) {
+                    return res.status(404).json({
+                        message: "Post doesn't exist.",
+                    });
+                }
+                res.json(doc);
             }
-            if (!doc) {
-                return res.status(404).json({
-                    message: "Post doesn't exist."
-                })
-            }
-            res.json(doc);
-        }).populate('user')
+        ).populate("user");
     } catch (e) {
         console.log(e);
         res.status(500).json({
-            message: "Error."
+            message: "Error.",
         });
     }
-}
+};
 
 export const remove = async(req, res) => {
     try {
         const postId = req.params.id;
         PostModel.findOneAndDelete({
-            _id: postId,
-        }, (err, doc) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({
-                    message: "Error on deleting post."
-                })
+                _id: postId,
+            },
+            (err, doc) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({
+                        message: "Error on deleting post.",
+                    });
+                }
+                if (!doc) {
+                    return res.status(404).json({
+                        message: "Post doesn't exist.",
+                    });
+                }
+                res.json({
+                    success: true,
+                });
             }
-            if (!doc) {
-                return res.status(404).json({
-                    message: "Post doesn't exist."
-                })
-            }
-            res.json({
-                success: true
-            })
-        });
+        );
     } catch (err) {
         console.log(err);
         res.status(500).json({
             message: "Error on get the posts",
         });
     }
-}
+};
 
 export const likingLogic = async(req, res) => {
     try {
@@ -191,18 +208,20 @@ export const getPostsByUserId = async(req, res) => {
 };
 
 export const getPostsByTags = async(req, res) => {
-    try {
-        const tags = req.body.content.split(",");
-        console.log(tags);
-        const posts = await PostModel.find().populate("user").exec();
-        let filterPosts = posts.filter((item) =>
-            item.tags.some((tag) => tags.includes(tag))
-        );
-        res.json(filterPosts);
-    } catch (e) {
-        console.log(e);
-        res.status(500).json({
-            message: "Error on getting posts",
+    const tags = req.body.content.split(",");
+    await PostModel.find()
+        .populate("user")
+        .exec()
+        .then((response) => {
+            let filterPosts = response.filter((item) =>
+                item.tags.some((tag) => tags.includes(tag))
+            );
+            res.json(filterPosts);
+        })
+        .catch((e) => {
+            console.log(e);
+            res.status(500).json({
+                message: "Error on getting posts",
+            });
         });
-    }
 };
