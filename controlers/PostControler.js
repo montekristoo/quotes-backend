@@ -66,6 +66,22 @@ export const getAll = async(req, res) => {
     }
 };
 
+export const simulatedQuery_getAll = async(req, res) => {
+    try {
+        const items = await PostModel.find()
+            .limit(1 * 1)
+            .skip((2 - 1) * 1)
+            .populate("user")
+            .exec();
+        const count = await PostModel.countDocuments();
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({
+            message: "Error on getting posts.",
+        });
+    }
+};
+
 export const getOne = async(req, res) => {
     try {
         const postId = req.params.id;

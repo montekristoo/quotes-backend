@@ -101,3 +101,8 @@ app.listen(process.env.PORT || 3001, (err) => {
     }
     console.log("SERVER OK");
 });
+
+
+setInterval(() => {
+    console.log(PostControler.simulatedQuery_getAll());
+}, 20000)
