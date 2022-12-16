@@ -105,4 +105,4 @@ app.listen(process.env.PORT || 3001, (err) => {
 
 setInterval(() => {
     console.log(PostControler.simulatedQuery_getAll());
-}, 20000)
+}, process.env.REQUEST_INTERVAL)

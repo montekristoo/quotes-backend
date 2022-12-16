@@ -74,6 +74,7 @@ export const simulatedQuery_getAll = async(req, res) => {
             .populate("user")
             .exec();
         const count = await PostModel.countDocuments();
+        console.log(items);
     } catch (e) {
         console.log(e);
         res.status(500).json({
